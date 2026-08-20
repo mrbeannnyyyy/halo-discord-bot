@@ -1,0 +1,4 @@
+import { DashboardShell } from "@/components/dashboard-shell";
+import { prisma } from "@/lib/prisma";
+import { InterviewManager } from "@/app/dashboard/interviews/interview-manager";
+export default async function Interviews(){const [applications,interviews]=await Promise.all([prisma.application.findMany({where:{status:{in:["PENDING","UNDER_REVIEW","ACCEPTED_FOR_INTERVIEW"]}},include:{applicant:true},orderBy:{submittedAt:"desc"}}),prisma.interview.findMany({include:{application:{include:{applicant:true}}},orderBy:{scheduledFor:"asc"}})]);return <DashboardShell><p className="eyebrow">Scheduling</p><h1 style={{fontFamily:"Playfair Display"}}>Interviews</h1><InterviewManager applications={applications.map(item=>({id:item.id,name:item.applicant.displayName}))} initial={interviews.map(item=>({id:item.id,name:item.application.applicant.displayName,date:item.scheduledFor.toISOString(),timezone:item.timezone,status:item.status}))}/></DashboardShell>}

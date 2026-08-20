@@ -1,0 +1,7 @@
+import { DashboardShell } from "@/components/dashboard-shell";
+import { prisma } from "@/lib/prisma";
+import { HomeEditor } from "./home-editor";
+
+const defaults: Record<string, string> = { siteName: "Halo", heroEyebrow: "Applications are now open", heroTitle: "Find your place in the", heroAccent: "next chapter.", heroDescription: "Halo is a thoughtful community for people who want to build, contribute and belong. Take a few minutes to tell us what you would bring.", primaryCta: "Apply with Discord", secondaryCta: "Explore the process", closingNote: "Applications close 31 August · Responses within 7 days", processEyebrow: "A simple, human process", processTitle: "Clear from first click to first hello.", step1Title: "Tell us your story", step1Description: "Sign in with Discord and complete a guided application at your own pace.", step2Title: "Meet the team", step2Description: "Our reviewers read every application. Strong fits receive a short interview invitation.", step3Title: "Make an impact", step3Description: "Join a community that values kindness, craft and putting people first." };
+
+export default async function Website(){ const items = await prisma.websiteContent.findMany(); const values = { ...defaults, ...Object.fromEntries(items.map((item) => [item.key, item.value])) }; return <DashboardShell><p className="eyebrow">Website management</p><h1 style={{fontFamily:"Playfair Display"}}>Content</h1><HomeEditor initial={values}/></DashboardShell>}
