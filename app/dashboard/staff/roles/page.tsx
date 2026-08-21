@@ -1,0 +1,5 @@
+import { DashboardShell } from "@/components/dashboard-shell";
+import { WebsiteManagerForm } from "@/app/dashboard/staff/roles/manager";
+import { prisma } from "@/lib/prisma";
+export const dynamic="force-dynamic";
+export default async function Roles(){const guildId=process.env.STAFF_GUILD_ID;const token=process.env.DISCORD_BOT_TOKEN;let roles:{id:string;name:string}[]=[];if(guildId&&token){const response=await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`,{headers:{Authorization:`Bot ${token}`},cache:"no-store"});if(response.ok)roles=(await response.json() as {id:string;name:string;managed:boolean}[]).filter(role=>!role.managed&&role.name!=="@everyone").map(role=>({id:role.id,name:role.name})).sort((a,b)=>a.name.localeCompare(b.name));}const configured=await prisma.staffRole.findMany({include:{permissions:true}});return <DashboardShell><p className="eyebrow">Access control</p><h1 style={{fontFamily:"Playfair Display"}}>Roles & permissions</h1><WebsiteManagerForm roles={roles} configured={configured.map(role=>({discordRoleId:role.discordRoleId,name:role.name,permissions:role.permissions.map(item=>item.permission)}))}/></DashboardShell>}

@@ -1,0 +1,6 @@
+import Link from "next/link";
+import { DashboardShell } from "@/components/dashboard-shell";
+import { prisma } from "@/lib/prisma";
+import { Status } from "@/components/ui";
+import { DeleteApplicationButton } from "@/app/dashboard/applications/delete-button";
+export default async function Applications(){const applications=await prisma.application.findMany({orderBy:{submittedAt:"desc"},include:{applicant:true},take:50});return <DashboardShell><div className="top"><div><p className="eyebrow">Review queue</p><h1>Applications</h1></div></div><div className="card">{applications.length?<div className="table-wrap"><table className="table"><thead><tr><th>APPLICANT</th><th>STATUS</th><th>SUBMITTED</th><th/></tr></thead><tbody>{applications.map(item=><tr key={item.id}><td><b>{item.applicant.displayName}</b><br/><span className="muted">@{item.applicant.username}</span></td><td><Status kind={item.status==="PENDING"?"pending":""}>{item.status.replaceAll("_"," ")}</Status></td><td>{item.submittedAt.toLocaleDateString()}</td><td><Link className="button ghost" style={{padding:"7px 10px"}} href={`/dashboard/applications/${item.id}`}>Review</Link><DeleteApplicationButton id={item.id}/></td></tr>)}</tbody></table></div>:<><h2>No applications yet</h2><p className="muted">When someone submits an application, it will appear here.</p></>}</div></DashboardShell>}
